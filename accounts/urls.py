@@ -14,4 +14,3 @@ urlpatterns = [
     path('profile/', ProfileDetailAPIView.as_view(), name='profile-detail'),
     path('profile/update/', ProfileUpdateAPIView.as_view(), name='profile-update'),
 ]
-

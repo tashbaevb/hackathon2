@@ -2,12 +2,19 @@ from django.contrib.auth import login
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer
+from .serializers import UserSerializer, RegisterSerializer
 from rest_framework import generics, permissions
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import RetrieveAPIView
 from .models import Profile
 from .serializers import ProfileSerializer
+from rest_framework.generics import UpdateAPIView
+from rest_framework import status
+from rest_framework import generics
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from .serializers import ChangePasswordSerializer
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
+
 
 class ProfileDetailAPIView(RetrieveAPIView):
     queryset = Profile.objects.all()
@@ -18,15 +25,11 @@ class ProfileDetailAPIView(RetrieveAPIView):
         return self.request.user.profile
 
 
-from rest_framework.generics import UpdateAPIView
-from rest_framework.response import Response
-from rest_framework import status
-
-
 class ProfileUpdateAPIView(UpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         profile = self.get_object()
         serializer = self.get_serializer(profile, data=request.data, partial=True)
@@ -36,6 +39,7 @@ class ProfileUpdateAPIView(UpdateAPIView):
 
     def get_object(self):
         return self.request.user.profile
+
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
@@ -72,15 +76,7 @@ class UserAPI(generics.RetrieveAPIView):
         return self.request.user
 
 
-from rest_framework import generics, permissions
-
 # Change Password
-from rest_framework import status
-from rest_framework import generics
-from rest_framework.response import Response
-from django.contrib.auth.models import User
-from .serializers import ChangePasswordSerializer
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 
 
 class ChangePasswordView(generics.UpdateAPIView):
